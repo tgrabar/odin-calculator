@@ -6,8 +6,20 @@ const divide = (a, b) => {
   return a / b;
 }
 
-console.log(add(3, 2));
-console.log(subtract(3, 2));
-console.log(multiply(3, 2));
-console.log(divide(3, 2));
-console.log(divide(3, 0));
+function operate(num1, num2, func) {
+  switch (func) {
+    case '+': return add(num1, num2);
+    case '-': return subtract(num1, num2);
+    case '*': return multiply(num1, num2);
+    case '/': return divide(num1, num2);
+    default: return 0;
+  }
+}
+
+const operation = [];
+operation.push(3);
+operation.push('-');
+operation.push(20);
+
+console.log(operate(operation[0], operation[2], operation[1]));
+console.log(operation.length)
