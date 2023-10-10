@@ -2,53 +2,68 @@ const numbers = [];
 let num = '';
 let mathFunc = '';
 let answerReceived = false;
+const numKeys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '.'];
+const mathKeys = ['+', '-', '*', '/'];
 
 const displayRow1 = document.querySelector('.disp-row1');
 const displayRow2 = document.querySelector('.disp-row2');
-const mathBtns = document.querySelectorAll('.math-btn');
 const numBtns = document.querySelectorAll('.num-btn');
-const equalBtn = document.querySelectorAll('.eq-btn');
+const mathBtns = document.querySelectorAll('.math-btn');
+const equalBtn = document.querySelector('.eq-btn');
+
 document.querySelector('#clear').addEventListener('click', () => clear());
 document.querySelector('#negate').addEventListener('click', () => negate(num));
+document.querySelector('#backspace').addEventListener('click', () => backSpace());
 
-
-document.querySelectorAll('.num-btn').forEach((btn) => {
-  btn.addEventListener('click', e => {
-    // entering a number after a calculation begins a new one
-    if (answerReceived) clear();
-    num += e.target.textContent;
-    updateDisplayRow1(e);
-    enableButtons(equalBtn);
-  });
+numBtns.forEach((btn) => {
+  btn.addEventListener('click', e => numberEntry(e.target.dataset.key));
 });
+numKeys.forEach(key => document.addEventListener('keydown', (e) => { if(e.key === key) numberEntry(key) }));
 
-document.addEventListener('click', e => {
-  if (e.target.matches('.math-btn')) {
-    if (numbers.length === 0 && num !== '') {
-      setFirstNum(num, e.target.id);
-      updateDisplayRow1(e, ' ');
-      disableButtons(mathBtns);
-      answerReceived = false;
-    }
-    else if (numbers.length === 1 && mathFunc === '') {
-      setSecondNum(num);
-      updateDisplayRow1(e, ' ');
-      disableButtons(mathBtns);
-      enableButtons(equalBtn);
-      answerReceived = false;
-    }
+mathBtns.forEach((btn) => {
+  btn.addEventListener('click', e => operatorEntry(e.target.dataset.key));
+});
+mathKeys.forEach(key => document.addEventListener('keydown', (e) => { if(e.key === key) operatorEntry(key) }));
+
+equalBtn.addEventListener('click', () => equalsEntry());
+document.addEventListener('keydown', (e) => { if(e.key === 'Enter' || e.key === '=') equalsEntry() })
+
+function numberEntry(key) {
+  // entering a number after a calculation begins a new one
+  if (answerReceived) clear();
+  // prevent more than one decimal per number
+  if(num.includes('.') && key === '.') return;
+  num += key;
+  updateDisplayRow1(key);
+  equalBtn.removeAttribute('disabled');
+}
+
+function operatorEntry(key) {
+  if (numbers.length === 0 && num !== '') {
+    setFirstNum(num, key);
+    updateDisplayRow1(key, ' ');
+    disableButtons(mathBtns);
+    answerReceived = false;
   }
-})
+  else if (numbers.length === 1 && mathFunc === '') {
+    setSecondNum(num);
+    updateDisplayRow1(key, ' ');
+    disableButtons(mathBtns);
+    equalBtn.removeAttribute('disabled');
+    answerReceived = false;
+  }
+  console.log(numbers);
+}
 
-document.addEventListener('click', e => {
-  if (e.target.matches('.eq-btn') && numbers.length === 1 && mathFunc !== '') {
+function equalsEntry() {
+  if (numbers.length === 1 && mathFunc !== '') {
     setSecondNum(num);
     displayRow1.textContent += ' =';
     operate(Number(numbers[0]), Number(numbers[1]), mathFunc);
     enableButtons(mathBtns);
-    disableButtons(equalBtn);
+    equalBtn.setAttribute('disabled', '');
   }
-})
+}
 
 const add = (a, b) => a + b;
 const subtract = (a, b) => a - b;
@@ -61,23 +76,45 @@ const divide = (a, b) => {
 function operate(num1, num2, func) {
   let answer = '';
   switch (func) {
-    case 'plus': answer = add(num1, num2);
+    case '+': answer = add(num1, num2);
       break;
-    case 'minus': answer = subtract(num1, num2);
+    case '-': answer = subtract(num1, num2);
       break;
-    case 'multiply': answer = multiply(num1, num2);
+    case '*': answer = multiply(num1, num2);
       break;
-    case 'divide': answer = divide(num1, num2);
+    case '/': answer = divide(num1, num2);
       break;
     default: return 0;
   }
   displayAnswer(answer);
+  console.log(answer);
   answerReceived = true;
 }
 
-function updateDisplayRow1 (e, addSpace = '') {
+function setFirstNum(number, operator) {
+  numbers.push(number);
+  num = '';
+  mathFunc = operator;
+}
+
+function setSecondNum(number) {
+  numbers.push(number);
+  num = '';
+}
+
+function updateDisplayRow1 (key, addSpace = '') {
   if(displayRow1.textContent.length <= 35)
-  displayRow1.textContent += addSpace + e.target.textContent + addSpace;
+  displayRow1.textContent += addSpace + symbols(key) + addSpace;
+}
+
+function symbols(key) {
+  switch(key) {
+    case '/': return '÷';
+    case '*': return '×';
+    case '+': return '+';
+    case '-': return '−';
+    default: return key;
+  }
 }
 
 function displayAnswer(answer) {
@@ -89,31 +126,9 @@ function displayAnswer(answer) {
   numbers.length = 0;  
   num = answer;
   mathFunc = '';
-  console.log(numbers)
 }
 
-function setFirstNum(number, operator) {
-  numbers.push(number);
-  num = '';
-  mathFunc = operator;
-  console.log(numbers);
-}
-
-function setSecondNum(number) {
-  numbers.push(number);
-  num = '';
-  console.log(numbers);
-}
-
-function disableButtons (btns) {
-  btns.forEach(btn => btn.setAttribute('disabled', ''));
-}
-
-function enableButtons (btns) {
-  btns.forEach(btn => btn.removeAttribute('disabled'));
-}
-
-function clear () {
+function clear() {
   displayRow1.textContent = '';
   displayRow2.textContent = '';
   numbers.length = 0;
@@ -122,7 +137,7 @@ function clear () {
   answerReceived = false;
   enableButtons(numBtns);
   enableButtons(mathBtns);
-  enableButtons(equalBtn);
+  equalBtn.removeAttribute('disabled');
 }
 
 function negate(number) {
@@ -130,4 +145,20 @@ function negate(number) {
   const arr = displayRow1.textContent.split(' ');
   arr[arr.length - 1] = num;
   displayRow1.textContent = arr.join(' ');
+}
+
+function backSpace() {
+  if(num.length > 0)
+  num = num.slice(0, -1);
+  const arr = displayRow1.textContent.split(' ');
+  arr[arr.length - 1] = num;
+  displayRow1.textContent = arr.join(' ');
+}
+
+function disableButtons (btns) {
+  btns.forEach(btn => btn.setAttribute('disabled', ''));
+}
+
+function enableButtons (btns) {
+  btns.forEach(btn => btn.removeAttribute('disabled'));
 }
