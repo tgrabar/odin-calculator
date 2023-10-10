@@ -85,3 +85,7 @@
 .btn:active {
   filter: brightness(50%);
 }
+
+.active {
+  filter: brightness(50%);
+}

@@ -15,14 +15,36 @@ document.querySelector('#clear').addEventListener('click', () => clear());
 document.querySelector('#negate').addEventListener('click', () => negate(numberEntered));
 document.querySelector('#backspace').addEventListener('click', () => backSpace());
 
-numBtns.forEach((btn) => { btn.addEventListener('click', e => numberEntry(e.target.dataset.key)); });
-numKeys.forEach(key => document.addEventListener('keydown', (e) => { if(e.key === key) numberEntry(key) }));
+numBtns.forEach((btn) => { btn.addEventListener('click', e =>  numberEntry(e.target.dataset.key)); });
+numKeys.forEach(key => document.addEventListener('keydown', (e) => {
+  if(e.key === key) {
+    keyPressEffect(e);
+    numberEntry(key);
+    }
+  }));
 
 mathBtns.forEach((btn) => { btn.addEventListener('click', e => operatorEntry(e.target.dataset.key)); });
-mathKeys.forEach(key => document.addEventListener('keydown', (e) => { if(e.key === key) operatorEntry(key) }));
+mathKeys.forEach(key => document.addEventListener('keydown', (e) => {
+  if(e.key === key && !document.querySelector(`button[data-key="${e.key}"]`).hasAttribute('disabled')) {
+    keyPressEffect(e);
+    operatorEntry(key);
+  }
+ }));
 
 equalBtn.addEventListener('click', () => equalsEntry());
-document.addEventListener('keydown', (e) => { if(e.key === 'Enter' || e.key === '=') equalsEntry() })
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'Enter' && !equalBtn.hasAttribute('disabled')) {
+    keyPressEffect(e);
+    equalsEntry();
+  }
+})
+
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'Backspace') {
+    keyPressEffect(e);
+    backSpace();
+  }
+})
 
 function numberEntry(key) {
   // entering a number after a calculation begins a new one
@@ -138,4 +160,10 @@ function disableButtons (btns) {
 
 function enableButtons (btns) {
   btns.forEach(btn => btn.removeAttribute('disabled'));
+}
+
+function keyPressEffect(e) {
+  const keyPressed = document.querySelector(`button[data-key="${e.key}"]`)
+  keyPressed.classList.add('active');
+  setTimeout(() => keyPressed.classList.remove('active'), 150);
 }
