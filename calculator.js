@@ -1,5 +1,5 @@
 const numbers = [];
-let num = '';
+let numberEntered = '';
 let mathFunc = '';
 let answerReceived = false;
 const numKeys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '.'];
@@ -12,17 +12,13 @@ const mathBtns = document.querySelectorAll('.math-btn');
 const equalBtn = document.querySelector('.eq-btn');
 
 document.querySelector('#clear').addEventListener('click', () => clear());
-document.querySelector('#negate').addEventListener('click', () => negate(num));
+document.querySelector('#negate').addEventListener('click', () => negate(numberEntered));
 document.querySelector('#backspace').addEventListener('click', () => backSpace());
 
-numBtns.forEach((btn) => {
-  btn.addEventListener('click', e => numberEntry(e.target.dataset.key));
-});
+numBtns.forEach((btn) => { btn.addEventListener('click', e => numberEntry(e.target.dataset.key)); });
 numKeys.forEach(key => document.addEventListener('keydown', (e) => { if(e.key === key) numberEntry(key) }));
 
-mathBtns.forEach((btn) => {
-  btn.addEventListener('click', e => operatorEntry(e.target.dataset.key));
-});
+mathBtns.forEach((btn) => { btn.addEventListener('click', e => operatorEntry(e.target.dataset.key)); });
 mathKeys.forEach(key => document.addEventListener('keydown', (e) => { if(e.key === key) operatorEntry(key) }));
 
 equalBtn.addEventListener('click', () => equalsEntry());
@@ -32,32 +28,31 @@ function numberEntry(key) {
   // entering a number after a calculation begins a new one
   if (answerReceived) clear();
   // prevent more than one decimal per number
-  if(num.includes('.') && key === '.') return;
-  num += key;
+  if(numberEntered.includes('.') && key === '.') return;
+  numberEntered += key;
   updateDisplayRow1(key);
   equalBtn.removeAttribute('disabled');
 }
 
 function operatorEntry(key) {
-  if (numbers.length === 0 && num !== '') {
-    setFirstNum(num, key);
+  if (numbers.length === 0 && numberEntered !== '') {
+    setFirstNum(numberEntered, key);
     updateDisplayRow1(key, ' ');
     disableButtons(mathBtns);
     answerReceived = false;
   }
   else if (numbers.length === 1 && mathFunc === '') {
-    setSecondNum(num);
+    setSecondNum(numberEntered);
     updateDisplayRow1(key, ' ');
     disableButtons(mathBtns);
     equalBtn.removeAttribute('disabled');
     answerReceived = false;
   }
-  console.log(numbers);
 }
 
 function equalsEntry() {
   if (numbers.length === 1 && mathFunc !== '') {
-    setSecondNum(num);
+    setSecondNum(numberEntered);
     displayRow1.textContent += ' =';
     operate(Number(numbers[0]), Number(numbers[1]), mathFunc);
     enableButtons(mathBtns);
@@ -65,56 +60,37 @@ function equalsEntry() {
   }
 }
 
-const add = (a, b) => a + b;
-const subtract = (a, b) => a - b;
-const multiply = (a, b) => a * b;
-const divide = (a, b) => {
-  if (b === 0) return 0;
-  return a / b;
-}
-
 function operate(num1, num2, func) {
   let answer = '';
   switch (func) {
-    case '+': answer = add(num1, num2);
+    case '+': answer = num1 + num2;
       break;
-    case '-': answer = subtract(num1, num2);
+    case '-': answer = num1 - num2;
       break;
-    case '*': answer = multiply(num1, num2);
+    case '*': answer = num1 * num2;
       break;
-    case '/': answer = divide(num1, num2);
+    case '/': answer = num1 / (num2 === 0 ? 1 : num2);
       break;
     default: return 0;
   }
   displayAnswer(answer);
-  console.log(answer);
   answerReceived = true;
 }
 
-function setFirstNum(number, operator) {
-  numbers.push(number);
-  num = '';
+function setFirstNum(num, operator) {
+  numbers.push(num);
+  numberEntered = '';
   mathFunc = operator;
 }
 
-function setSecondNum(number) {
-  numbers.push(number);
-  num = '';
+function setSecondNum(num) {
+  numbers.push(num);
+  numberEntered = '';
 }
 
 function updateDisplayRow1 (key, addSpace = '') {
   if(displayRow1.textContent.length <= 35)
-  displayRow1.textContent += addSpace + symbols(key) + addSpace;
-}
-
-function symbols(key) {
-  switch(key) {
-    case '/': return '÷';
-    case '*': return '×';
-    case '+': return '+';
-    case '-': return '−';
-    default: return key;
-  }
+  displayRow1.textContent += addSpace + key + addSpace;
 }
 
 function displayAnswer(answer) {
@@ -124,7 +100,7 @@ function displayAnswer(answer) {
     displayRow1.textContent += ' ' + (Number.isInteger(answer) ? answer : answer.toFixed(2));
   displayRow2.textContent = answer;
   numbers.length = 0;  
-  num = answer;
+  numberEntered = answer;
   mathFunc = '';
 }
 
@@ -132,7 +108,7 @@ function clear() {
   displayRow1.textContent = '';
   displayRow2.textContent = '';
   numbers.length = 0;
-  num = '';
+  numberEntered = '';
   mathFunc = '';
   answerReceived = false;
   enableButtons(numBtns);
@@ -140,18 +116,19 @@ function clear() {
   equalBtn.removeAttribute('disabled');
 }
 
-function negate(number) {
-  num = Number(number) * -1;
+function negate(num) {
+  if(num === '' || num === '0') return;
+  numberEntered = Number(num) * -1;
   const arr = displayRow1.textContent.split(' ');
-  arr[arr.length - 1] = num;
+  arr[arr.length - 1] = numberEntered;
   displayRow1.textContent = arr.join(' ');
 }
 
 function backSpace() {
-  if(num.length > 0)
-  num = num.slice(0, -1);
+  if(numberEntered.length > 0)
+  numberEntered = numberEntered.slice(0, -1);
   const arr = displayRow1.textContent.split(' ');
-  arr[arr.length - 1] = num;
+  arr[arr.length - 1] = numberEntered;
   displayRow1.textContent = arr.join(' ');
 }
 
