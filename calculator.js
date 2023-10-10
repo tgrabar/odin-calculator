@@ -8,9 +8,9 @@ const displayRow2 = document.querySelector('.disp-row2');
 const mathBtns = document.querySelectorAll('.math-btn');
 const numBtns = document.querySelectorAll('.num-btn');
 const equalBtn = document.querySelectorAll('.eq-btn');
-const clearBtn = document.querySelector('#clear');
+document.querySelector('#clear').addEventListener('click', () => clear());
+document.querySelector('#negate').addEventListener('click', () => negate(num));
 
-clearBtn.addEventListener('click', () => clear());
 
 document.querySelectorAll('.num-btn').forEach((btn) => {
   btn.addEventListener('click', e => {
@@ -123,4 +123,11 @@ function clear () {
   enableButtons(numBtns);
   enableButtons(mathBtns);
   enableButtons(equalBtn);
+}
+
+function negate(number) {
+  num = Number(number) * -1;
+  const arr = displayRow1.textContent.split(' ');
+  arr[arr.length - 1] = num;
+  displayRow1.textContent = arr.join(' ');
 }
