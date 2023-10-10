@@ -22,35 +22,43 @@
   margin: 20px;
 }
 
-.display, .num-btn, .op-btn, .fn-btn {
+.display, .num-btn, .math-btn, .fn-btn, .eq-btn, .blank {
   width: 100px;
   height: 100px;
+  border: none;
   font-size: 50px;
   text-align: center;
   line-height: 100px;
 }
 
 .fn-btn {
-  width: 200px;
-  height: 60px;
-  line-height: 60px;
   background-color: darkgrey;
-  grid-column: span 2;
 }
 
 .display {
-  font-size: 80px;
   font-family: 'calculator';
-  padding: 10px;
+  padding-right: 10px;
   width: 480px;
   background-color: lightgrey;  
   grid-column: span 4;
   border-radius: 20px;
   text-align: right;
-  line-height: 80px;
+  line-height: 0px;
 }
 
-.num-btn, .op-btn, .fn-btn {
+.disp-row1 {
+  margin: 20px 10px;
+  font-family: 'calculator';
+  font-size: 30px;
+}
+
+.disp-row2 {
+  margin: 40px 10px;
+  font-family: 'calculator';
+  font-size: 50px;
+}
+
+.num-btn, .math-btn, .fn-btn, .eq-btn {
   font-weight: bold;
   border-radius: 50px;
 }
@@ -59,11 +67,10 @@
   background-color: darkgrey;
 }
 
-.op-btn {
+.math-btn, .eq-btn {
   background-color: #edc361;
 }
 
-#backspace {
-  line-height: 30px;
-  font-size: 90px;
+.blank {
+  background-color: dimgrey;
 }
